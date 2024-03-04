@@ -48,13 +48,13 @@ void Game::Draw()
     switch (nextBlock.id)
     {
     case 3:
-        nextBlock.Draw(255, 290);
+        nextBlock.Draw(280, 290);
         break;
     case 4:
-        nextBlock.Draw(255, 280);
+        nextBlock.Draw(280, 280);
         break;
     default:
-        nextBlock.Draw(270, 270);
+        nextBlock.Draw(295, 273);
         break;
     }
 }
@@ -77,7 +77,7 @@ void Game::HandleInput()
         break;
     case KEY_DOWN:
         MoveBlockDown();
-        UpdateScore(0, 1);
+        
         break;
     case KEY_UP:
         RotateBlock();

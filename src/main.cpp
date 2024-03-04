@@ -29,8 +29,23 @@ int main()
 
     Font font = LoadFontEx("Font/monogram.ttf", 64, 0, 0);
     Image background = LoadImage("resources/background.png"); // initialize background
+    Image grid = LoadImage("resources/grid.PNG"); // initialize components
+    Image gameover = LoadImage("resources/IMG_5410.PNG"); // initialize background
+    Image finalscore = LoadImage("resources/IMG_5421.PNG"); // initialize components
+    Image logo = LoadImage("resources/IMG_5424.PNG"); // initialize components
+    Image enter = LoadImage("resources/IMG_5423.PNG"); // initialize components
     ImageResize(&background, 500, 680);
+    ImageResize(&grid, 500, 680);
+    ImageResize(&gameover, 500, 150);
+    ImageResize(&finalscore, 500, 100);
+    ImageResize(&logo, 500, 680);
+    ImageResize(&enter, 500, 150);
     Texture2D texture = LoadTextureFromImage(background);
+    Texture2D frame = LoadTextureFromImage(grid);
+    Texture2D endgame = LoadTextureFromImage(gameover);
+    Texture2D finalpoints = LoadTextureFromImage(finalscore);
+    Texture2D pic = LoadTextureFromImage(logo);
+    Texture2D startgame = LoadTextureFromImage(enter);
 
     Game game = Game();
 
@@ -58,7 +73,7 @@ int main()
                 // TODO: Update TITLE screen variables here!
 
                 // Press enter to change to GAMEPLAY screen
-                if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+                if (IsKeyPressed(KEY_ENTER))
                 {
                     currentScreen = GAMEPLAY;
                 }
@@ -71,19 +86,21 @@ int main()
                 {
                     game.MoveBlockDown();
                 }
-                if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
-                {
-                    currentScreen = ENDING;
-                }
             } break;
             case ENDING:
             {
                 // TODO: Update ENDING screen variables here!
 
                 // Press enter to return to TITLE screen
-                if (IsKeyPressed(KEY_ENTER) || IsGestureDetected(GESTURE_TAP))
+                if (IsKeyPressed(KEY_ENTER))
                 {
                     currentScreen = TITLE;
+                    UpdateMusicStream(game.music);
+                    game.HandleInput();
+                    if (EventTriggered(0.2))
+                    {
+                        game.MoveBlockDown();
+                    }
                 }
             } break;
             default: break;
@@ -100,47 +117,49 @@ int main()
             {
                 case LOGO:
                 {
-                    // TODO: Draw LOGO screen here!
-                    DrawText("LOGO SCREEN", 20, 20, 40, LIGHTGRAY);
-                    DrawText("WAIT for 2 SECONDS...", 290, 220, 20, GRAY);
+                    DrawTexture(texture, screenWidth - texture.width, screenHeight - texture.height, WHITE);
+                    DrawText("LOADING.. C++CJIA", 20, 20, 40, WHITE);
 
                 } break;
                 case TITLE:
                 {
-                    // TODO: Draw TITLE screen here!
-                    DrawRectangle(0, 0, screenWidth, screenHeight, GREEN);
-                    DrawText("TITLE SCREEN", 20, 20, 40, DARKGREEN);
-                    DrawText("PRESS ENTER or TAP to JUMP to GAMEPLAY SCREEN", 120, 220, 20, DARKGREEN);
+                    DrawTexture(texture, screenWidth - texture.width, screenHeight - texture.height, WHITE);
+                    DrawTexture(pic, screenWidth - pic.width, screenHeight - pic.height, WHITE);
+                    DrawTexture(startgame, screenWidth - startgame.width, screenHeight - startgame.height, WHITE);
 
                 } break;
                 case GAMEPLAY:
                 {
                     ClearBackground(darkBlue);
-                    DrawTextEx(font, "Score", {365, 15}, 38, 2, WHITE);
-                    DrawTextEx(font, "Next", {370, 175}, 38, 2, WHITE);
+                    DrawTexture(texture, screenWidth - texture.width, screenHeight - texture.height, WHITE);
+                    DrawTexture(frame, screenWidth - grid.width, screenHeight - grid.height, WHITE);
+                    
                     if (game.gameOver)
                     {
-                        DrawTextEx(font, "GAME OVER!", {320, 450}, 38, 2, WHITE);
                         currentScreen = ENDING;
                     }
-                    DrawRectangleRounded({320, 55, 170, 60}, 0.3, 6, lightBlue);
+                    
 
                     char scoreText[10];
                     sprintf(scoreText, "%d", game.score);
                     Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
 
-                    DrawTextEx(font, scoreText, {320 + (170 - textSize.x) / 2, 65}, 38, 2, WHITE);
-                    DrawRectangleRounded({320, 215, 170, 180}, 0.3, 6, lightBlue);
-                    DrawTexture(texture, screenWidth - texture.width, screenHeight - texture.height, WHITE);
+                    DrawTextEx(font, scoreText, {320 + (210 - textSize.x) / 2, 60}, 38, 2, WHITE);
+                    
+                    
                     game.Draw();
 
                 } break;
                 case ENDING:
                 {
+                    char scoreText[10];
+                    sprintf(scoreText, "%d", game.score);
+                    Vector2 textSize = MeasureTextEx(font, scoreText, 38, 2);
                     // TODO: Draw ENDING screen here!
-                    DrawRectangle(0, 0, screenWidth, screenHeight, BLUE);
-                    DrawText("ENDING SCREEN", 20, 20, 40, DARKBLUE);
-                    DrawText("PRESS ENTER or TAP to RETURN to TITLE SCREEN", 120, 220, 20, DARKBLUE);
+                    DrawTexture(texture, screenWidth - texture.width, screenHeight - texture.height, WHITE);
+                    DrawTexture(endgame, screenWidth - endgame.width, screenHeight - endgame.height*4, WHITE);
+                    DrawTextEx(font, scoreText, {140 + (210 - textSize.x) / 2, 400}, 80, 30, WHITE);
+                    DrawTexture(finalpoints, screenWidth - endgame.width, screenHeight - endgame.height*2.5, WHITE);
 
                 } break;
                 default: break;
@@ -149,13 +168,14 @@ int main()
         EndDrawing();
     }
 
-    // De-Initialization
-    //--------------------------------------------------------------------------------------
 
-    // TODO: Unload all loaded data (textures, fonts, audio) here!
     UnloadTexture(texture);
-
-    CloseWindow();        // Close window and OpenGL context
+    UnloadTexture(frame);
+    UnloadTexture(endgame);
+    UnloadTexture(finalpoints);
+    UnloadTexture(pic);
+    UnloadTexture(startgame);
+    CloseWindow();       
 
 
     return 0;
